@@ -14,6 +14,9 @@ export default function AdminRoute() {
     reader.readAsDataURL(event.target.files[0]);
     reader.onload = function () {
       console.log(reader.result);
+      if (messImage.length < 1) {
+        setMessImage([reader.result]);
+      }
       setImages((prevImages) => [...prevImages, reader.result]);
       console.log(messImage);
       console.log(hostelImages);
