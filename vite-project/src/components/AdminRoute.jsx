@@ -9,33 +9,50 @@ export default function AdminRoute() {
   const [hostelMessage, setHostelMessage] = useState("");
   const [messMessage, setMessMessage] = useState("");
 
-  const handleImageUpload = (event, setImages) => {
-    var reader = new FileReader();
-    reader.readAsDataURL(event.target.files[0]);
-    reader.onload = function () {
-      console.log(reader.result);
-      if (messImage.length < 1) {
-        setMessImage([reader.result]);
-      }
-      setImages((prevImages) => [...prevImages, reader.result]);
-      console.log(messImage);
-      console.log(hostelImages);
-    };
-    reader.onerror = function (error) {
-      console.log("Error: ", error);
-    };
+  const handleImageUpload = (event, setImages, isSingle = false) => {
+    const files = Array.from(event.target.files);
+    const readers = [];
+
+    files.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onload = function () {
+        readers.push(reader.result);
+        if (readers.length === files.length) {
+          setImages((prevImages) => (isSingle ? readers : [...prevImages, ...readers]));
+        }
+      };
+
+      reader.onerror = function (error) {
+        console.log("Error: ", error);
+      };
+    });
   };
+
   useEffect(() => {
     console.log(hostelImages);
   }, [hostelImages]);
   const SaveToDB = async (data) => {
-    console.log(data);
-    const res = await axios.post("http://localhost:3001/api/admin/data", data);
-    console.log(res);
-    return res;
+    try {
+      console.log("Submitting Data:", data);
+      const res = await axios.post("http://localhost:3001/api/admin/data", {
+        ...data,
+        hostelImages: data.hostelImages.map((img) => (img.startsWith("data:image/") ? img : `data:image/png;base64,${img}`)),
+        messImage: data.messImage.length > 0 ? data.messImage : [], // Ensure messImage is always an array
+      });
+      console.log("Response:", res);
+      return res;
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
   };
+  useEffect(() => {
+    console.log("Updated messImage:", messImage);
+  }, [messImage]);
+
   const handleRemoveImage = (index, setImages, images) => {
-    setImages(images.filter((_, i) => i !== index));
+    setImages([...images.slice(0, index), ...images.slice(index + 1)]);
   };
   // useEffect(() => {
   //   fetch(`http://localhost:3000/api/admin/data?${hostel}`)
@@ -129,16 +146,16 @@ export default function AdminRoute() {
       <button
         style={{ marginTop: "20px", background: "#007BFF", color: "white", padding: "10px 20px", border: "none", borderRadius: "4px", cursor: "pointer" }}
         onClick={() => {
-          setData({
+          const updatedData = {
             message,
             hostelMessage,
             messMessage,
             hostelImages,
             messImage,
             hostel,
-          });
+          };
           alert("Your data has been submitted successfully");
-          SaveToDB(data);
+          SaveToDB(updatedData); // Directly passing updated data
         }}
       >
         Submit

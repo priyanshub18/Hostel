@@ -23,7 +23,7 @@ app.get("/", (req, res) => {
 //   res.json({ success: true, message: "Image uploaded successfully!" });
 // });
 app.put("/api/admin/data", (req, res) => {
-  const { hostelImages, messImage, message, hostelMessage, messMessage , hostel } = req.body;
+  const { hostelImages, messImage, message, hostelMessage, messMessage, hostel } = req.body;
 
   hostelModel.updateOne(
     {},
@@ -50,18 +50,18 @@ app.put("/api/admin/data", (req, res) => {
   res.json({ success: true, message: "Data updated in database" });
 });
 app.post("/api/admin/data", async (req, res) => {
-  const { hostelImages, messImages, message, hostelMessage, messMessage , hostel } = req.body;
+  // Correct destructuring from 'messImages' to 'messImage'
+  const { hostelImages, messImage, message, hostelMessage, messMessage, hostel } = req.body;
 
   await hostelModel.create({
     hostelImages: hostelImages,
-    messImages: messImages,
+    messImage: messImage, // Updated from 'messImages' to 'messImage'
     message: message,
     hostelMessage: hostelMessage,
     messMessage: messMessage,
     hostel: hostel,
   });
 
-  console.log("Data inserted into database");
   res.json({ success: true, message: "Data inserted into database" });
 });
 
