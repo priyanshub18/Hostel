@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.24.1",
+    "@heroicons/react": "^2.2.0",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
+    "globals": "^16.0.0",
     "gsap": "^3.12.5",
     "jquery": "^3.7.1",
     "react": "^18.3.1",
